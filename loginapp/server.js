@@ -4,7 +4,7 @@ var path =require('path');
 var url= require('url');
 var bodyparser= require('body-parser');
 var app= express();
-var temp;
+var temp={};
 mongoose.connect('mongodb://localhost/loginapp');
 //app.set('view engine','ejs');
 
@@ -18,20 +18,28 @@ app.listen(8000, function() {
 });
 //******Important***************//rs
 app.use(express.static(__dirname + '/file'));     //serve static assets
-app.get('*', function(req, res) {
-    res.sendfile('./file/index.html'); // load the single view file (angular will handle the page changes on the front-end)   	
+app.get('*', function(req, res) {	
+	if(req.path==='/signup'){
+	 res.sendfile('./file/index.html'); // load the single view file (angular will handle the page changes on the front-end)   	
+    }
+	else if(req.path==='/userinfo')
+	{
+		res.json(temp)
+	}
+	else
+	{
+		if(temp==undefined || temp.email==undefined)
+		{
+			res.redirect('/signup')
+		}
+		else
+		{
+			res.sendfile('./file/index.html'); 
+		}
+	}
 });
 
 app.post('/signup', function(req,res){
 	console.log(req.query);
-	User(req.query).save(function(err){
-	            if(err) throw err;
-	            else
-		        console.log('Item Saved');
-                });
-	//save to db
+	temp=req.query
 });
-
-app.post('/',function(req,res){
-	console.log('Here');
-})//this is used simply for debugging
