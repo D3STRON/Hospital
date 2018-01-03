@@ -5,18 +5,28 @@ app.config(['$routeProvider','$locationProvider',function($routeProvider, $locat
    $routeProvider
         .when('/',{
            
-        	redirectTo		: '/signup',
-          
+        	redirectTo		: '/signuppatient'
+            
         })
-        .when('/signup',{
+		.when('/signupdoctor',{
+			templateUrl     : './views/DocSignUpPage.html',
+			controller      : 'docsignupController'
+			
+		})
+		.when('/loginpatient',{
            
-        	templateUrl		: 'SignUpPage.html',
-            controller 		: 'authController'
+        	templateUrl		: './views/LoginPage.html',
+            controller      : 'loginController'
+        })
+        .when('/signuppatient',{
+           
+        	templateUrl		: './views/SignUpPage.html',
+            controller 		: 'singinController'
           
         })
          .when('/MainPage',{
            
-        	templateUrl		: 'MainPage.html',
+        	templateUrl		: './views/MainPage.html',
             controller      : 'mainController'
         })
         $locationProvider.html5Mode({
@@ -24,14 +34,15 @@ app.config(['$routeProvider','$locationProvider',function($routeProvider, $locat
     requireBase: false
     });
 }]);
-app.controller('authController',function($scope, $http,  $location){
+
+app.controller('singinController',function($scope, $http,  $location){
 	$scope.data={email:'', password:''};
 	$scope.add= function()
 	{	
 	if($scope.data.email.length>0 && $scope.data.password.length>0){
 		$http({
 		method: 'POST',	
-        url: 'http://localhost:8000/signup',
+        url: 'http://localhost:8000/signuppatient',
         params:$scope.data
     }).then(function (httpResponse) {
         console.log('response:', httpResponse);
@@ -44,23 +55,45 @@ app.controller('authController',function($scope, $http,  $location){
 });
 
 app.controller('mainController',function($scope, $http,  $location){
-   
-   
+     
     $http.get("/userinfo")
                 .then(function(response) {
                     $scope.data= response.data.email;
 					alert('Helo '+$scope.data);
                 });
+	$http.get("/docinfo")
+                .then(function(response) {
+                    $scope.doctors= response.data;
+                });			
    
 		$scope.logout= function()
 		{
 			$http({
 		method: 'POST',	
-        url: 'http://localhost:8000/signup',
+        url: 'http://localhost:8000/signuppatient',
         params:{}
       }).then(function (httpResponse) {
         console.log('response:', httpResponse);
     });
-	$location.path( "/signup" )
+	$location.path( "/signuppatient" )
 		}
 });
+
+app.controller('loginController',function($scope ,$http){
+	$scope.data={email:'',password:''}
+})
+
+app.controller('docsignupController',function($scope, $http){
+	$scope.data={email:'',password:'', department:''}
+	$scope.add= function()
+	{  
+		$http({
+		method: 'POST',	
+        url: 'http://localhost:8000/signupdoctor',
+        params:$scope.data
+        }).then(function (httpResponse) {
+        console.log('response:', httpResponse);
+        });
+		$scope.data={email:'',password:'', department:''}
+	}	
+})

@@ -1,0 +1,12 @@
+<form>
+  <input type="text" placeholder="EMAIL" ng-model="data.email"/></br>
+  <input type="text" placeholder="PASSWORD" ng-model="data.password"/></br>
+                           <select  ng-model="data.department">
+								<option value="None" selected disabled>Department</option>
+								<option value="Opthamology">Opthamology</option>
+								<option value="Cardiology">Cardiology</option>
+								<option value="Physiology">Physiology</option>
+							</select>
+  <input type="submit" value="Sign up" ng-click="add()"/>	
+  <p>{{data.department}}</p>  
+</form> 
