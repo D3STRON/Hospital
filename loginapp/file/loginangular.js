@@ -55,11 +55,16 @@ app.controller('singinController',function($scope, $http,  $location){
 });
 
 app.controller('mainController',function($scope, $http,  $location){
-     
-    $http.get("/userinfo")
+    $scope.selected={email:''};
+	$scope.select=function(event)
+	{
+		//alert(event.target.id);
+		$scope.selected.email=event.target.id;
+	}
+	
+	$http.get("/userinfo")
                 .then(function(response) {
                     $scope.data= response.data.email;
-					alert('Helo '+$scope.data);
                 });
 	$http.get("/docinfo")
                 .then(function(response) {

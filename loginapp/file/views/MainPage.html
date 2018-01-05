@@ -1,0 +1,12 @@
+<div>
+<script  type="text/javascript">
+ </script>
+ <h1>Hello {{data}}</h1>
+ <input type="button" value="logout" ng-click="logout()">
+  <div ng-repeat="doctor in doctors">
+     <p>{{doctor.email}}  {{doctor.department}}</p>
+	 <input type="button" id={{doctor.email}} value="TAKE APPOINTMENT" data-ng-click='select($event)' >
+  </div>
+  {{selected.email}}
+ </div>
+ 
