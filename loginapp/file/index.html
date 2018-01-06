@@ -1,5 +1,23 @@
 <html>
  <head>
+ <style>
+   ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+li {
+    float: left;
+}
+
+
+/* Change the link color to #111 (black) on hover */
+li a:hover {
+    background-color: #4CAF50;
+}
+ </style>
  <h3>Hey There!<h3>
            <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular.min.js"></script>
        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-route.js"></script>
@@ -7,6 +25,7 @@
  </head>
  <body ng-app="loginangular">
  <div ng-view>
+ 
  </div>
  </body>
 </html>

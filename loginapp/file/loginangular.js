@@ -55,22 +55,54 @@ app.controller('singinController',function($scope, $http,  $location){
 });
 
 app.controller('mainController',function($scope, $http,  $location){
-    $scope.selected={email:''};
-	$scope.select=function(event)
-	{
-		//alert(event.target.id);
-		$scope.selected.email=event.target.id;
-	}
-	
+    $scope.selected={patient:'', doctor:''};
+	$scope.Cardiology=[]
+	$scope.Opthamology=[]
+	$scope.Physiology=[]
+	$scope.department=[]
+	$scope.doctors=[]
 	$http.get("/userinfo")
                 .then(function(response) {
-                    $scope.data= response.data.email;
+                    $scope.selected.patient= response.data.email;// to get the email of the logged in patient from server
+					$scope.data=response.data; //for all the additional information
                 });
 	$http.get("/docinfo")
                 .then(function(response) {
-                    $scope.doctors= response.data;
-                });			
-   
+                    for( i=0; i<response.data.length;i++)
+					{
+						if(response.data[i].department==='Opthamology')
+						{
+							$scope.Opthamology.push(response.data[i]);
+						}
+						else if(response.data[i].department==='Physiology')
+						{
+							$scope.Physiology.push(response.data[i]);
+						}else
+					    {
+		                    $scope.Cardiology.push(response.data[i]);
+						}
+					}//list of all the doctors
+                    $scope.department.push($scope.Cardiology)
+                    $scope.department.push($scope.Opthamology)	
+                    $scope.department.push($scope.Physiology)					
+                });
+    $scope.setlist= function(k)
+	{
+		$scope.doctors=$scope.department[k]
+	}
+    				
+   $scope.select=function(event)
+	{
+		//alert(event.target.id);
+		$scope.selected.doctor=$scope.doctors[event.target.id].email;
+		$http({
+		method: 'POST',	
+        url: 'http://localhost:8000/MainPage/take-appointment',
+        params:$scope.selected
+      }).then(function (httpResponse) {
+        console.log('response:', httpResponse);
+    });
+}
 		$scope.logout= function()
 		{
 			$http({

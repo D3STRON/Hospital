@@ -8,13 +8,7 @@ var temp={};
 mongoose.connect('mongodb://localhost/loginapp');
 //app.set('view engine','ejs');
 
-var doctorSchema = new mongoose.Schema({
-	email: String,
-	password: String,
-	department: String,
-	patients:[]
-});
-var Doctor= mongoose.model('Doctor',doctorSchema);
+var Doctor= require('./models/Doctor.js')
 app.listen(8000, function() {
     console.log('Listening on 8000');
 });
@@ -64,3 +58,15 @@ app.post('/signupdoctor',function(req,res){
 				}
                 }); 
 });
+
+app.post('/MainPage/take-appointment', function(req,res){
+	Doctor.findOne({email:req.query.doctor}, function(err,data){
+		if(err){throw err}
+		else
+		{
+			data.patients.push(req.query.patient)
+			console.log(data)
+		}
+	})
+})
+
