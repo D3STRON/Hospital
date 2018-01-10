@@ -46,8 +46,7 @@ app.controller('singupController',function($scope, $http,  $location){
 });
 
 app.controller('mainController',function($scope, $http,  $location, $window){
-   $scope.selected={patient:JSON.parse($window.localStorage.getItem('user')).email, doctor:''};
-	$scope.Cardiology=[]
+  $scope.Cardiology=[]
 	$scope.Opthamology=[]
 	$scope.Physiology=[]
 	$scope.department=[]
@@ -59,14 +58,8 @@ app.controller('mainController',function($scope, $http,  $location, $window){
 		   'Content-type':'application/json',
 		   'Authorization':$window.localStorage.getItem('id_token')
 	   }
-    }).catch(function(err)
-	{
-		if(err.status==401)
-		{
-           $location.path('/login')
-		}
-	}).then(function(response){
-		//$scope.doctors=response.data
+    }).then (function (response){
+		$scope.selected={patient:JSON.parse($window.localStorage.getItem('user')).email, doctor:''};
 		for( i=0; i<response.data.length;i++)
 					{
 						if(response.data[i].department==='Opthamology')
@@ -84,8 +77,15 @@ app.controller('mainController',function($scope, $http,  $location, $window){
                     $scope.department.push($scope.Cardiology)
                     $scope.department.push($scope.Opthamology)	
                     $scope.department.push($scope.Physiology)
+	}).catch(function(err)
+	{
+		if(err.status==401)
+		{
+           $location.path('/login')
+		}
 	})
    
+	
    $scope.setlist= function(k)
 	{
 		$scope.doctors=$scope.department[k]
