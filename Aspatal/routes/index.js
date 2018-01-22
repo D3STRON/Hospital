@@ -7,25 +7,15 @@ var Doctor= require('../models/doctorModel')
 
 var router =express.Router()
 
-router.get('/signup',function(req,res){
+router.get('*',function(req,res){
    res.sendfile('./angular/index.html')
 })
 
-router.get('/login', function(req,res){
-	res.sendfile('./angular/index.html')
-})
-
-router.get('/MainPage',function(req,res){
-	res.sendfile('./angular/index.html')
-})
-
-router.get('/signupdoctor',function(req,res){
-	res.sendfile('./angular/index.html')
-})
-
 router.post('/signup',function(req,res){
-	var newUser= req.body
+	var newUser=req.body
+	newUser.medical_records=[]
 	User.createNewUser(newUser)
+	res.send(true)
 })
 
 router.post('/authenticate',function(req,res){
@@ -36,7 +26,6 @@ router.post('/authenticate',function(req,res){
 		   if(!user){
 			   return res.json({success: false, msg: 'User not found'})
 		   }
-		   
 		   User.comparePassword(password, user.password ,function(err, isMatch){//compare the encrypted password
 			   if(err) throw err;
 			   if(isMatch){
@@ -58,20 +47,59 @@ router.post('/authenticate',function(req,res){
 	   })
 })
 
-router.get('/authenticator', passport.authenticate('jwt', {session:false}), 
-(req, res, next) => {
+router.post('/authenticator', passport.authenticate('jwt', {session:false}), 
+(req, res, next) => {	
+ if(req.body.doc==true){
   Doctor.find({},function(err,data){
 		if(err)throw err
 		else{
 			res.json(data)
 		}
 	})
+  }
+  else{
+	  User.findOne(req.body,function(err,data){
+		  if(err) throw err
+		  else{
+			  res.json(data)
+		  }
+	  })
+  }
 });
+
+router.post('/MainPage',passport.authenticate('jwt',{session:false}),
+(req,res,next)=>{
+   Doctor.findOne({email:req.body.doctor},function(err,data){
+	   if(err) throw err
+	   else{
+           for(i=0;i<data.patients.length;i++)
+		   {
+			   if(data.patients[i]===req.body.patient)
+			   {
+			     return res.send(false)	   
+			   }
+		   }
+		   data.patients.push(req.body.patient)
+		   Doctor.createNewDoctor(data)
+		   return res.send(true)
+	   }
+   })  
+})
 
 router.post('/signupdoctor',function(req,res){
 	req.body.patients=[]
 	Doctor.createNewDoctor(req.body)
 	res.send(true)
+})
+
+router.post('/Add-Record',function(req,res){
+	User.findOne({email:'Destron'},function(err,data){
+		data.medical_records.push(req.body)
+		data.password='hello'
+		console.log(data)
+		User.createNewUser(data)
+		res.send(true)
+	})
 })
 
 module.exports=router;
