@@ -201,7 +201,7 @@ app.controller('viewrecordController',function($scope,$http,$location,$window){
             else if(temp.department==='Physiology')
             {
 				$scope.ph_records.push(temp)
-				if($scope.ph_years.length==0 || $scope.ph_years[$scope.ph_years.length-1]!==temp.year)
+				if($scope.ph_years.length==0 || $scope.ph_years[$scope.ph_years.length-1].year!=temp.year)
 				{
 					$scope.ph_years.push({year:temp.year, department:2})
 				}
@@ -209,7 +209,7 @@ app.controller('viewrecordController',function($scope,$http,$location,$window){
             else if(temp.department==='Cardiology')
             {
 				$scope.ca_records.push(temp)
-				if($scope.ca_years.length==0 || $scope.ca_years[$scope.ca_years.length-1]!==temp.year)
+				if($scope.ca_years.length==0 || $scope.ca_years[$scope.ca_years.length-1].year!=temp.year)
 				{
 					$scope.ca_years.push({year:temp.year, department:0})
 				}
