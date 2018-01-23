@@ -1,0 +1,18 @@
+<div>
+<script  type="text/javascript">
+ </script>
+ <h1>Hello {{selected.patient}}</h1>
+ <input type="button" value="logout" ng-click="logout()">
+ <input type="button" value="Manage Records" ng-click="gotorecords()">
+ </br>
+ <ul>
+  <li><a ng-click="setlist(0)">| Cardiology |</a></li>
+  <li><a ng-click="setlist(1)">| Opthamology |</a></li>
+  <li><a ng-click="setlist(2)">| Physiology |</a></li></br>
+ <ul>
+  <div ng-repeat="doctor in doctors">
+     <p>{{doctor.email}}  {{doctor.department}}</p>
+	 <input type="button" id={{$index}} value="TAKE APPOINTMENT" data-ng-click='select($event)' >
+  </div>
+  {{selected.doctor}}
+ </div>
