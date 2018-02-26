@@ -5,7 +5,7 @@ var doctorSchema = new mongoose.Schema({
 	email: String,
 	password: String,
 	department: String,
-	target: 0,
+	target: Number,
 	patients:[]
 });
 var Doctor = mongoose.model('Doctor',doctorSchema);
@@ -24,3 +24,4 @@ module.exports.createNewDoctor =function(newDoctor){
    });
 });
 }
+

@@ -87,7 +87,7 @@ router.post('/MainPage',passport.authenticate('jwt',{session:false}),
    Doctor.findOne({email:req.body.doctor},function(err,data){
 	   if(err) throw err
 	   else{
-           for(i=0;i<data.patients.length;i++)
+           for(i=0;i<data.patients.length;i++)//if a patient clicks tries to take appointment of a doctor whose appointment he already has but the page isnt refreshed so the take appointment option is still available
 		   {
 			   if(data.patients[i]===req.body.patient)
 			   {
@@ -103,6 +103,7 @@ router.post('/MainPage',passport.authenticate('jwt',{session:false}),
 
 router.post('/signupdoctor',function(req,res){
 	req.body.patients=[]
+	//console.log(req.body)
 	Doctor.createNewDoctor(req.body)
 	res.send(true)
 })
@@ -115,6 +116,28 @@ router.post('/Add-Record',function(req,res){
 		User.createNewUser(data)
 		res.send(true)
 	})
+})
+
+router.post('/Doctor-Updates',function(req,res){
+	console.log(req.body)
+   Doctor.findOne({email:req.body.email},function(err,data){
+	   if(data!=null){
+		   bcrypt.compare(req.body.password, data.password, (err, isMatch) => {
+              if(err) throw err
+              else if(isMatch){
+				  data.target=req.body.target
+				  Doctor.createNewDoctor(data)
+				  res.json({user:'Found'})
+			  }
+			  else{
+				  res.json({user:'Not Found'})
+			  }
+            });
+	    }
+		else{
+		  res.json({user:'Not Found'})
+		}
+   })
 })
 
 module.exports=router;

@@ -8,6 +8,12 @@ app.config(['$routeProvider','$locationProvider',function($routeProvider, $locat
         	redirectTo		: '/login'
             
         })
+		.when('/Login-Doctor',{
+           
+        	templateUrl		: './views/LoginDoctor.html',
+			controller      : 'docloginController'
+            
+        })
 		.when('/Add-Record',{
 			templateUrl     : './views/addRecord.html',
 			controller      : 'addrecordController'
@@ -159,11 +165,11 @@ app.controller('loginController',function($scope ,$http ,$location, $window){
 })
 
 app.controller('docsignupController',function($scope, $http){
-	$scope.data={email:'',password:'', department:''}
+	$scope.data={email:'',password:'', department:'',target:0}
 	$scope.add= function()
 	{  
 		$http.post('/signupdoctor',$scope.data)
-		$scope.data={email:'',password:'', department:''}
+		$scope.data={email:'',password:'', department:'',target:0}
 	}	
 })
 
@@ -253,6 +259,10 @@ app.controller('viewrecordController',function($scope,$http,$location,$window){
 		}
 	}
 	
+	$scope.gotoMainPage= function(){
+		$location.path('/MainPage')
+	}
+	
 	$scope.logout= function(){
 		$window.localStorage.clear()
 	     $location.path('/login')
@@ -268,7 +278,7 @@ app.controller('addrecordController',function($scope,$http){
 		}
 		else{	
 		    $scope.data.year=$scope.date.getFullYear()
-            $scope.data.date=$scope.date.getDate()+"-"+$scope.date.getMonth()	
+            $scope.data.date=$scope.date.getDate()+"-"+getMonthinWords($scope.date.getMonth())	
             console.log($scope.data)			
 			$http({
 			method:'POST',
@@ -278,3 +288,41 @@ app.controller('addrecordController',function($scope,$http){
 		}
 	}
 })
+
+app.controller('docloginController',function($scope,$http,$window,$location){
+	$scope.data={email:'',password:'',target:0}
+	$scope.add= function(){
+		$http({
+		url:'/Doctor-Updates',
+		method:'POST',
+		data:$scope.data
+	 }).then(function(res){
+		if(res.data.user==='Found'){
+			$window.localStorage.setItem('Doc_email',$scope.email)
+			$window.localStorage.setItem('Validity','Valid')
+			$location.path('/Add-Record')
+		}
+		else{
+			alert('Invalid Username or Password')
+		}
+	 })
+	}
+})
+
+var getMonthinWords= function(i)
+{
+	var month = new Array();
+month[0] = "January";
+month[1] = "February";
+month[2] = "March";
+month[3] = "April";
+month[4] = "May";
+month[5] = "June";
+month[6] = "July";
+month[7] = "August";
+month[8] = "September";
+month[9] = "October";
+month[10] = "November";
+month[11] = "December";
+  return month[i]
+}
