@@ -49,7 +49,7 @@ router.post('/authenticate',function(req,res){
 
 router.post('/authenticator', passport.authenticate('jwt', {session:false}), 
 (req, res, next) => {	
- if(req.body.doc==true){
+ if(req.body.getdoclist==true){
   Doctor.find({},function(err,data){
 		if(err)throw err
 		else{
@@ -71,6 +71,11 @@ router.post('/authenticator', passport.authenticate('jwt', {session:false}),
 			res.json(temp)
 		}
 	})
+  }
+  else if(req.body.getdocinfo==true){
+	  Doctor.findOne({email:req.body.email},function(err,data){
+		  res.json(data)
+	  })
   }
   else{
 	  User.findOne(req.body,function(err,data){
@@ -95,6 +100,7 @@ router.post('/MainPage',passport.authenticate('jwt',{session:false}),
 			   }
 		   }
 		   data.patients.push(req.body.patient)
+		   data.password="hello"
 		   Doctor.createNewDoctor(data)
 		   return res.send(true)
 	   }
@@ -126,8 +132,17 @@ router.post('/Doctor-Updates',function(req,res){
               if(err) throw err
               else if(isMatch){
 				  data.target=req.body.target
+				  data.password=req.body.password// this has to be reset because the data reprived from the database will have encrypted password and if we add this data element then the  encrypted password will be re-encrypted
 				  Doctor.createNewDoctor(data)
-				  res.json({user:'Found'})
+				  User.findOne({email:'demo'},function(err,user){//since schema in the passport .js if of the User thus we use a demo user in database which we use to assign tokens to doctors
+					  if(err) throw err
+					  else{
+						 const token = jwt.sign({data: user}, 'Secret', {
+                         expiresIn: 604800 // 1 week
+                         });
+				        res.json({user:'Found',token:'JWT '+token})
+					  }
+				  })
 			  }
 			  else{
 				  res.json({user:'Not Found'})
@@ -139,5 +154,7 @@ router.post('/Doctor-Updates',function(req,res){
 		}
    })
 })
+
+
 
 module.exports=router;

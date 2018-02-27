@@ -13,7 +13,7 @@
   <div ng-repeat="element in currentdept">
 	 <input type="button" id={{element}} value={{element.year}} data-ng-click='select($event)' >
   </div>
-  
+  <h3>RECORDS OF YEAR:{{key.year}}</h3>
    <div ng-repeat="record in currentrecords">
 	 <p>DEPARTMENT: {{record.department}}</p>
 	 <p>DATE: {{record.date}}</p>

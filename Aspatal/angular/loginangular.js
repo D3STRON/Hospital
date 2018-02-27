@@ -70,7 +70,7 @@ app.controller('mainController',function($scope, $http,  $location, $window){
    $http({
 	   method: 'POST',
 	   url: '/authenticator',
-	   data:{doc: true,user_email: JSON.parse($window.localStorage.getItem('user')).email},//this is possibile only if the method:'POST' is used or else data cnat be sent to the back end by method: 'GET', 
+	   data:{getdoclist: true,user_email: JSON.parse($window.localStorage.getItem('user')).email},//this is possibile only if the method:'POST' is used or else data cnat be sent to the back end by method: 'GET', 
 	   headers:{
 		   'Content-type':'application/json',
 		   'Authorization':$window.localStorage.getItem('id_token')
@@ -185,6 +185,7 @@ app.controller('viewrecordController',function($scope,$http,$location,$window){
 	$scope.op_years=[]
 	$scope.ph_years=[]
 	$scope.patient
+	$scope.key
 	$http({
 		url:'/authenticator',
 		method:'POST',
@@ -248,13 +249,13 @@ app.controller('viewrecordController',function($scope,$http,$location,$window){
 	$scope.select=function(event)
 	{
 		$scope.currentrecords=[]
-		var key=JSON.parse(event.target.id)
-		console.log(key)
-		for(i=0;i<$scope.deptrecords[key.department].length;i++)
+		$scope.key=JSON.parse(event.target.id)
+		console.log($scope.key)
+		for(i=0;i<$scope.deptrecords[$scope.key.department].length;i++)
 		{
-			if($scope.deptrecords[key.department][i].year==key.year)
+			if($scope.deptrecords[$scope.key.department][i].year==$scope.key.year)
 			{
-				$scope.currentrecords.push($scope.deptrecords[key.department][i])
+				$scope.currentrecords.push($scope.deptrecords[$scope.key.department][i])
 			}
 		}
 	}
@@ -269,21 +270,40 @@ app.controller('viewrecordController',function($scope,$http,$location,$window){
 	}
 })
 
-app.controller('addrecordController',function($scope,$http){
+app.controller('addrecordController',function($scope,$http,$location, $window){
 	$scope.date=''
-	$scope.data={year:'',date:'',diagnosis:'',medication:'',department:''}
+	$scope.record={year:'',date:'',diagnosis:'',medication:'',department:''}
+	$scope.patients=[]
+	
+	$http({
+		url:'/authenticator',
+		method:'POST',
+		data:{getdocinfo:true,email:$window.localStorage.getItem('Doc_email')},
+		headers:{
+			'Content-type':'application/json',
+			'Authorization':$window.localStorage.getItem('Doc_token')
+		}
+	}).then(function(res){
+		$scope.patients=res.data.patients
+	}).catch(function(err)
+	{
+		if(err.status==401)
+		{
+           $location.path('/Login-Doctor')
+		}
+	})
 	$scope.push=function(){
 		if($scope.date.length==0){
 			alert('input date')
 		}
 		else{	
-		    $scope.data.year=$scope.date.getFullYear()
-            $scope.data.date=$scope.date.getDate()+"-"+getMonthinWords($scope.date.getMonth())	
-            console.log($scope.data)			
+		    $scope.record.year=$scope.date.getFullYear()
+            $scope.redord.date=$scope.date.getDate()+"-"+getMonthinWords($scope.date.getMonth())	
+            console.log($scope.record)			
 			$http({
 			method:'POST',
 			url:'/Add-Record',
-			data:$scope.data
+			data:$scope.record
 		})
 		}
 	}
@@ -298,8 +318,8 @@ app.controller('docloginController',function($scope,$http,$window,$location){
 		data:$scope.data
 	 }).then(function(res){
 		if(res.data.user==='Found'){
-			$window.localStorage.setItem('Doc_email',$scope.email)
-			$window.localStorage.setItem('Validity','Valid')
+			$window.localStorage.setItem('Doc_email',$scope.data.email)
+			$window.localStorage.setItem('Doc_token',res.data.token)
 			$location.path('/Add-Record')
 		}
 		else{
