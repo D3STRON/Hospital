@@ -53,12 +53,12 @@ router.post('/authenticator', passport.authenticate('jwt', {session:false}),
   Doctor.find({},function(err,data){
 		if(err)throw err
 		else{
-			console.log(req.body.user_email)
+			console.log(req.body.user.email)
 			var temp=[]
 			for(i=0;i<data.length;i++){
 				var flag=1
 				for(j=0;j<data[i].patients.length;j++){
-					if(data[i].patients[j]===req.body.user_email)
+					if(data[i].patients[j]===req.body.user.email)
 					{
 					   flag=0
 					   break;
@@ -78,7 +78,7 @@ router.post('/authenticator', passport.authenticate('jwt', {session:false}),
 	  })
   }
   else{
-	  User.findOne(req.body,function(err,data){
+	  User.findOne({email:req.body.user.email},function(err,data){
 		  if(err) throw err
 		  else{
 			  res.json(data)
@@ -134,7 +134,7 @@ router.post('/Doctor-Updates',function(req,res){
 				  data.target=req.body.target
 				  data.password=req.body.password// this has to be reset because the data reprived from the database will have encrypted password and if we add this data element then the  encrypted password will be re-encrypted
 				  Doctor.createNewDoctor(data)
-				  User.findOne({email:'demo'},function(err,user){//since schema in the passport .js if of the User thus we use a demo user in database which we use to assign tokens to doctors
+				  User.findOne({email:'demo'},function(err,user){//since schema in the passport .js if of the User thus we use a default user demo to assign valid tokens
 					  if(err) throw err
 					  else{
 						 const token = jwt.sign({data: user}, 'Secret', {

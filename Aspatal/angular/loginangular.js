@@ -70,7 +70,7 @@ app.controller('mainController',function($scope, $http,  $location, $window){
    $http({
 	   method: 'POST',
 	   url: '/authenticator',
-	   data:{getdoclist: true,user_email: JSON.parse($window.localStorage.getItem('user')).email},//this is possibile only if the method:'POST' is used or else data cnat be sent to the back end by method: 'GET', 
+	   data:{getdoclist: true,user: JSON.parse($window.localStorage.getItem('user'))},//this is possibile only if the method:'POST' is used or else data cnat be sent to the back end by method: 'GET', 
 	   headers:{
 		   'Content-type':'application/json',
 		   'Authorization':$window.localStorage.getItem('id_token')
@@ -189,7 +189,7 @@ app.controller('viewrecordController',function($scope,$http,$location,$window){
 	$http({
 		url:'/authenticator',
 		method:'POST',
-		data:{email:JSON.parse($window.localStorage.getItem('user')).email},
+		data:{user:JSON.parse($window.localStorage.getItem('user'))},
 		headers:{
 			'Content-type':'application/json',
 			'Authorization':$window.localStorage.getItem('id_token')
