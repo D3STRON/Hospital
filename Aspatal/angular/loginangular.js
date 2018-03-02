@@ -298,7 +298,7 @@ app.controller('addrecordController',function($scope,$http,$location, $window){
 		}
 		else{	
 		    $scope.record.year=$scope.date.getFullYear()
-            $scope.redord.date=$scope.date.getDate()+"-"+getMonthinWords($scope.date.getMonth())	
+            $scope.record.date=$scope.date.getDate()+"-"+getMonthinWords($scope.date.getMonth())	
             console.log($scope.record)			
 			$http({
 			method:'POST',
