@@ -1,4 +1,5 @@
 <div>
+ PATIENT NAME: {{current_patient}}</br></br>
  <form>
   <input type="date" ng-model="date"/></br>
   <input type="text" placeholder="diagnosis" ng-model="record.diagnosis" /></BR>
@@ -10,5 +11,6 @@
 								<option value="Physiology">Physiology</option>
 							</select>
   <input type="button" value="PUSH" ng-click="push()">
+  <input type="button" value="NEXT PATIENT" ng-click="nextPatient()">
  </form>
 </div>

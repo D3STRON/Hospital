@@ -25,3 +25,14 @@ module.exports.createNewDoctor =function(newDoctor){
 });
 }
 
+module.exports.updateDoctor =function(updatedDoctor){
+	
+	Doctor(updatedDoctor).save(function(err){
+		if(err)throw err
+        else{
+			console.log('New Doctor added')
+		}
+	  })
+   
+}
+

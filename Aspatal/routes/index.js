@@ -74,7 +74,8 @@ router.post('/authenticator', passport.authenticate('jwt', {session:false}),
   }
   else if(req.body.getdocinfo==true){
 	  Doctor.findOne({email:req.body.email},function(err,data){
-		  res.json(data)
+			  console.log(data)
+			  res.json(data)
 	  })
   }
   else{
@@ -100,8 +101,7 @@ router.post('/MainPage',passport.authenticate('jwt',{session:false}),
 			   }
 		   }
 		   data.patients.push(req.body.patient)
-		   data.password="hello"
-		   Doctor.createNewDoctor(data)
+		   Doctor.updateDoctor(data)
 		   return res.send(true)
 	   }
    })  
@@ -115,16 +115,15 @@ router.post('/signupdoctor',function(req,res){
 })
 
 router.post('/Add-Record',function(req,res){
-	User.findOne({email:'Destron'},function(err,data){
-		data.medical_records.push(req.body)
-		data.password='hello'
+	User.findOne({email:req.body.current_patient},function(err,data){
+		data.medical_records.push(req.body.record)
 		console.log(data)
-		User.createNewUser(data)
+		User.updateUser(data)
 		res.send(true)
 	})
 })
 
-router.post('/Doctor-Updates',function(req,res){
+router.post('/Doctor-Login',function(req,res){
 	console.log(req.body)
    Doctor.findOne({email:req.body.email},function(err,data){
 	   if(data!=null){
@@ -132,8 +131,7 @@ router.post('/Doctor-Updates',function(req,res){
               if(err) throw err
               else if(isMatch){
 				  data.target=req.body.target
-				  data.password=req.body.password// this has to be reset because the data reprived from the database will have encrypted password and if we add this data element then the  encrypted password will be re-encrypted
-				  Doctor.createNewDoctor(data)
+				  Doctor.updateDoctor(data)
 				  User.findOne({email:'demo'},function(err,user){//since schema in the passport .js if of the User thus we use a default user demo to assign valid tokens
 					  if(err) throw err
 					  else{
@@ -155,6 +153,14 @@ router.post('/Doctor-Updates',function(req,res){
    })
 })
 
-
+router.post('/Doctor-Updates',passport.authenticate('jwt',{session:false}),
+(req,res,next)=>{
+	if(req.body.next==true){
+		Doctor.remove({email:req.body.doctor.email},function(err){
+			if(err)throw err
+		})
+		Doctor.updateDoctor(req.body.doctor)
+	}
+})
 
 module.exports=router;

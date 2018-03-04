@@ -31,6 +31,16 @@ module.exports.createNewUser= function(newUser){
 	});
 }
 
+module.exports.updateUser= function(updatedUser){
+	        User(updatedUser).save(function(err){
+				if(err)throw err
+				else 
+				{
+					console.log('Item saved')
+				}
+			})
+}
+
 module.exports.getUserById = function(id, callback){
   User.findById(id, callback);
 }

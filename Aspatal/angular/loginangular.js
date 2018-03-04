@@ -39,11 +39,15 @@ app.config(['$routeProvider','$locationProvider',function($routeProvider, $locat
         	templateUrl		: './views/MainPage.html',
             controller      : 'mainController'
         })
-		.when('/ViewRecords',{
+		.when('/View-UserRecords',{
            
         	templateUrl		: './views/ViewRecords.html',
             controller      : 'viewrecordController'
         })
+		.when('/View-PatientRecords',{
+			templateUrl		: './views/ViewPatientRecords.html',
+            controller      : 'viewpatientrecordController'
+		})
         $locationProvider.html5Mode({
     enabled: true,
     requireBase: false
@@ -103,7 +107,7 @@ app.controller('mainController',function($scope, $http,  $location, $window){
 	})
    
    $scope.gotorecords= function(){
-	   $location.path('/ViewRecords')
+	   $location.path('/View-UserRecords')
    }
    
    $scope.setlist= function(k)
@@ -273,8 +277,7 @@ app.controller('viewrecordController',function($scope,$http,$location,$window){
 app.controller('addrecordController',function($scope,$http,$location, $window){
 	$scope.date=''
 	$scope.record={year:'',date:'',diagnosis:'',medication:'',department:''}
-	$scope.patients=[]
-	
+	$scope.data={record:undefined,current_patient:'',doctor:undefined,next:true}//data to be sent
 	$http({
 		url:'/authenticator',
 		method:'POST',
@@ -284,7 +287,8 @@ app.controller('addrecordController',function($scope,$http,$location, $window){
 			'Authorization':$window.localStorage.getItem('Doc_token')
 		}
 	}).then(function(res){
-		$scope.patients=res.data.patients
+		$scope.data.doctor=res.data
+		$scope.current_patient=$scope.data.doctor.patients[0]		
 	}).catch(function(err)
 	{
 		if(err.status==401)
@@ -299,13 +303,38 @@ app.controller('addrecordController',function($scope,$http,$location, $window){
 		else{	
 		    $scope.record.year=$scope.date.getFullYear()
             $scope.record.date=$scope.date.getDate()+"-"+getMonthinWords($scope.date.getMonth())	
-            console.log($scope.record)			
+            $scope.data.record=$scope.record
+            $scope.data.current_patient=$scope.current_patient			
 			$http({
 			method:'POST',
 			url:'/Add-Record',
-			data:$scope.record
-		})
+			data:$scope.data
+		    })
 		}
+	}
+	$scope.nextPatient=function(){
+		if($scope.data.doctor.patients.length>0){
+		  console.log($scope.data.doctor.patients)
+		  $scope.data.doctor.patients.splice(0,1)
+		  $http({
+			method:'POST',
+			url:'/Doctor-Updates',
+			data:$scope.data,
+			headers:{
+			'Content-type':'application/json',
+			'Authorization':$window.localStorage.getItem('Doc_token')
+		}
+	}).catch(function(err)
+	{
+		if(err.status==401)
+		{
+           $location.path('/Login-Doctor')
+		}
+	})
+		}
+	    else{
+			alert("You are a bad doctor, you have no patients taking your appointment")
+		}	
 	}
 })
 
@@ -313,7 +342,7 @@ app.controller('docloginController',function($scope,$http,$window,$location){
 	$scope.data={email:'',password:'',target:0}
 	$scope.add= function(){
 		$http({
-		url:'/Doctor-Updates',
+		url:'/Doctor-Login',
 		method:'POST',
 		data:$scope.data
 	 }).then(function(res){
@@ -328,6 +357,9 @@ app.controller('docloginController',function($scope,$http,$window,$location){
 	 })
 	}
 })
+
+
+
 
 var getMonthinWords= function(i)
 {
