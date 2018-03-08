@@ -78,6 +78,14 @@ router.post('/authenticator', passport.authenticate('jwt', {session:false}),
 			  res.json(data)
 	  })
   }
+  else if(req.body.getRecords==true){
+		User.findOne({email:req.body.patient},function(err,data){
+		  if(err) throw err
+		  else{
+			  res.json(data.medical_records)
+		  }
+	  })	  
+   }
   else{
 	  User.findOne({email:req.body.user.email},function(err,data){
 		  if(err) throw err

@@ -307,6 +307,9 @@ app.controller('addrecordController',function($scope,$http,$location, $window){
 		if($scope.date.length==0){
 			alert('input date')
 		}
+		else if($scope.data.doctor.patients.length==0){
+			alert("No patient to add record of.")
+		}
 		else{	
 		    $scope.record.year=$scope.date.getFullYear()
             $scope.record.date=$scope.date.getDate()+"-"+getMonthinWords($scope.date.getMonth())	
@@ -320,6 +323,18 @@ app.controller('addrecordController',function($scope,$http,$location, $window){
 		    })
 		}
 	}
+	
+	$scope.viewRecords= function(){
+		if($scope.data.doctor.patients.length==0)
+		{
+			alert("No patient to show record of.")
+		}
+		else{
+			$window.localStorage.setItem('current_patient',$scope.current_patient)
+			$location.path('/View-PatientRecords')
+		}
+	}
+	
 	$scope.nextPatient=function(){
 		if($scope.data.doctor.patients.length>0){
 		  console.log($scope.data.doctor.patients)
@@ -367,7 +382,52 @@ app.controller('docloginController',function($scope,$http,$window,$location){
 	}
 })
 
-
+app.controller('viewpatientrecordController',function($scope,$window,$location,$http){
+	$scope.records=[]
+	$scope.currentrecords=[]
+	$scope.years=[]
+	$scope.data={getRecords:true,patient:$window.localStorage.getItem('current_patient')}
+	$http({
+		url:'/authenticator',
+		method:'POST',
+		data:$scope.data,
+		headers:{
+			'Content-type':'application/json',
+			'Authorization':$window.localStorage.getItem('Doc_token')
+		}
+	}).then(function(res){
+		$scope.current_patient=$window.localStorage.getItem('current_patient')
+		for(i=0;i<res.data.length;i++)
+		{ 
+	      if(res.data[i].department==='Cardiology')
+		  {
+			  $scope.records.push(res.data[i])
+			  if($scope.years.length==0 || $scope.years[$scope.years.length-1]!=res.data[i].year)
+				{
+					$scope.years.push(res.data[i].year)
+				}
+		  }
+		}
+	}).catch(function(err)
+	{
+		if(err.status==401)
+		{
+           $location.path('/Login-Doctor')
+		}
+	})
+	
+	$scope.select= function(event){
+		$scope.currentrecords=[]
+		$scope.key=JSON.parse(event.target.id)
+		for(i=0;i<$scope.records.length;i++)
+		{
+			if($scope.records[i].year==$scope.key)
+			{
+				$scope.currentrecords.push($scope.records[i])
+			}
+		}
+	}
+})
 
 
 var getMonthinWords= function(i)

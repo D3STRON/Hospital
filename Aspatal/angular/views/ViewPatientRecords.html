@@ -1,10 +1,10 @@
 <div>
 <script  type="text/javascript">
  </script>
- <h1>{{patient}}'s Medical Records</h1>
+ <h1>{{current_patient}}'s Medical Records</h1>
  
-  <div ng-repeat="element in currentdept">
-	 <input type="button" id={{element}} value={{element.year}} data-ng-click='select($event)' >
+  <div ng-repeat="year in years">
+	 <input type="button" id={{year}} value={{year}} data-ng-click='select($event)' >
   </div>
   <h3>RECORDS OF YEAR:{{key.year}}</h3>
    <div ng-repeat="record in currentrecords">
