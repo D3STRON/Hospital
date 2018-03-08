@@ -101,6 +101,7 @@ router.post('/MainPage',passport.authenticate('jwt',{session:false}),
 			   }
 		   }
 		   data.patients.push(req.body.patient)
+		   data.target=data.target-1
 		   Doctor.updateDoctor(data)
 		   return res.send(true)
 	   }
@@ -130,7 +131,7 @@ router.post('/Doctor-Login',function(req,res){
 		   bcrypt.compare(req.body.password, data.password, (err, isMatch) => {
               if(err) throw err
               else if(isMatch){
-				  data.target=req.body.target
+				  data.target=data.target+req.body.target
 				  Doctor.updateDoctor(data)
 				  User.findOne({email:'demo'},function(err,user){//since schema in the passport .js if of the User thus we use a default user demo to assign valid tokens
 					  if(err) throw err
@@ -156,10 +157,14 @@ router.post('/Doctor-Login',function(req,res){
 router.post('/Doctor-Updates',passport.authenticate('jwt',{session:false}),
 (req,res,next)=>{
 	if(req.body.next==true){
-		Doctor.remove({email:req.body.doctor.email},function(err){
-			if(err)throw err
+		Doctor.findOne({email:req.body.doctor.email},function(err,data){
+			if(err) throw err;
+			else{
+				data.patients.splice(0,1)
+				data.target=data.target-1
+			    Doctor.updateDoctor(data)	
+			}
 		})
-		Doctor.updateDoctor(req.body.doctor)
 	}
 })
 

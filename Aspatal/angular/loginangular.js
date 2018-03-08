@@ -296,6 +296,13 @@ app.controller('addrecordController',function($scope,$http,$location, $window){
            $location.path('/Login-Doctor')
 		}
 	})
+	
+	$scope.logout= function(){
+		$window.localStorage.setItem("Doc_token",'')
+		$window.localStorage.setItem('Doc_email','')
+		$location.path('/Login-Doctor')
+	}
+	
 	$scope.push=function(){
 		if($scope.date.length==0){
 			alert('input date')
@@ -303,7 +310,8 @@ app.controller('addrecordController',function($scope,$http,$location, $window){
 		else{	
 		    $scope.record.year=$scope.date.getFullYear()
             $scope.record.date=$scope.date.getDate()+"-"+getMonthinWords($scope.date.getMonth())	
-            $scope.data.record=$scope.record
+            $scope.record.department=$scope.data.doctor.department
+			$scope.data.record=$scope.record
             $scope.data.current_patient=$scope.current_patient			
 			$http({
 			method:'POST',
@@ -316,6 +324,7 @@ app.controller('addrecordController',function($scope,$http,$location, $window){
 		if($scope.data.doctor.patients.length>0){
 		  console.log($scope.data.doctor.patients)
 		  $scope.data.doctor.patients.splice(0,1)
+		  $scope.current_patient=$scope.data.doctor.patients[0]
 		  $http({
 			method:'POST',
 			url:'/Doctor-Updates',
