@@ -8,7 +8,12 @@ var userSchema={
 		index:true
 	},
   password: String,
-  medical_records:[]
+  medical_records:[],
+  appointments:{
+	  cardiology:[],
+	  physiology:[],
+	  opthamology:[]
+  }
 }
 
 var User= mongoose.model('User', userSchema)

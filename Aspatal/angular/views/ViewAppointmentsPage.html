@@ -1,0 +1,19 @@
+<div>
+<script  type="text/javascript">
+ </script>
+ <h1>{{patient}}'s Medical Records</h1>
+ <input type="button" value="logout" ng-click="logout()">
+ <input type="button" value="Main Page" ng-click="gotoMainPage()">
+ </br>
+ <ul>
+  <li><a ng-click="setdept(0)">| Cardiology |</a></li>
+  <li><a ng-click="setdept(1)">| Opthalmology |</a></li>
+  <li><a ng-click="setdept(2)">| Physiology |</a></li></br>
+ </ul>
+  <div ng-repeat="appointment in current_appointments">
+  <p>
+   {{appointment}} of {{department}}</br>
+   <input type="button" value="CANCEL APPOINTMENT"/>
+  </p>
+  </div>
+ </div>

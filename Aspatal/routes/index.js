@@ -86,10 +86,14 @@ router.post('/authenticator', passport.authenticate('jwt', {session:false}),
 		  }
 	  })	  
    }
+  
   else{
 	  User.findOne({email:req.body.user.email},function(err,data){
 		  if(err) throw err
-		  else{
+		  else if(req.body.patient_appointments==true){
+	        res.json(data.appointments)
+          }
+	 	  else{
 			  res.json(data)
 		  }
 	  })
@@ -113,8 +117,26 @@ router.post('/MainPage',passport.authenticate('jwt',{session:false}),
 		   Doctor.updateDoctor(data)
 		   return res.send(true)
 	   }
-   })  
+   })
+   User.findOne({email:req.body.patient},function(err, data){
+	   if(err) throw err
+	   else{
+		   if(req.body.department==0){
+		       data.appointments.cardiology.push(req.body.doctor)
+			   //data.appointments.cardiology=[]
+		   }else if(req.body.department==1){
+			   data.appointments.opthamology.push(req.body.doctor)
+			   //data.appointments.opthamology=[]
+		   }else{
+			  data.appointments.physiology.push(req.body.doctor)
+			  //data.appointments.physiology=[]
+		   }
+		   User.updateUser(data)
+	   }
+   })   
 })
+
+
 
 router.post('/signupdoctor',function(req,res){
 	req.body.patients=[]

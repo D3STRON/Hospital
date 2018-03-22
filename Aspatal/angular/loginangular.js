@@ -23,6 +23,11 @@ app.config(['$routeProvider','$locationProvider',function($routeProvider, $locat
 			controller      : 'docsignupController'
 			
 		})
+		.when('/View-Appointments',{
+			templateUrl     : './views/ViewAppointmentsPage.html',
+			controller      : 'viewappointmentsController'
+			
+		})
 		.when('/login',{
            
         	templateUrl		: './views/LoginPage.html',
@@ -80,7 +85,7 @@ app.controller('mainController',function($scope, $http,  $location, $window){
 		   'Authorization':$window.localStorage.getItem('id_token')
 	   }
     }).then (function (response){
-		$scope.selected={patient:JSON.parse($window.localStorage.getItem('user')).email, doctor:''};
+		$scope.selected={patient:JSON.parse($window.localStorage.getItem('user')).email, doctor:'', department:0};
 		for( i=0; i<response.data.length;i++)
 					{
 						if(response.data[i].department==='Opthamology')
@@ -109,11 +114,15 @@ app.controller('mainController',function($scope, $http,  $location, $window){
    $scope.gotorecords= function(){
 	   $location.path('/View-UserRecords')
    }
+   $scope.gotoappointmetns= function(){
+	   $location.path('/View-Appointments')
+   }
    
    $scope.setlist= function(k)
 	{
 		$scope.currentdept=k
 		$scope.doctors=$scope.department[$scope.currentdept]
+		$scope.selected.department=k
 	}
    
    $scope.select= function(event){
@@ -138,8 +147,9 @@ app.controller('mainController',function($scope, $http,  $location, $window){
    
    $scope.logout= function()
    {
-	 $window.localStorage.clear()
-	 $location.path('/login')
+	 $window.localStorage.setItem("id_token","")
+		$window.localStorage.setItem("user","")
+		$location.path("/login")
    }
 });
 
@@ -177,6 +187,57 @@ app.controller('docsignupController',function($scope, $http){
 	}	
 })
 
+
+app.controller('viewappointmentsController', function($scope,$http, $location ,$window){
+	$scope.opthamology=[]
+	$scope.cardiology=[]
+	$scope.physiology=[]
+	$scope.current_appointments=[]
+	$scope.department
+	$http({
+	   method: 'POST',
+	   url: '/authenticator',
+	   data:{patient_appointments:true,user: JSON.parse($window.localStorage.getItem('user'))},//this is possibile only if the method:'POST' is used or else data cnat be sent to the back end by method: 'GET', 
+	   headers:{
+		   'Content-type':'application/json',
+		   'Authorization':$window.localStorage.getItem('id_token')
+	   }
+    }).then(function(res){
+		$scope.patient=JSON.parse($window.localStorage.getItem('user')).email
+		$scope.cardiology=res.data.cardiology
+		$scope.physiology=res.data.physiology
+		$scope.opthamology=res.data.opthamology
+		console.log(res.data)
+	}).catch(function(err)
+	{
+		if(err.status==401)
+		{
+           $location.path('/login')
+		}
+	})
+	$scope.gotoMainPage= function(){
+		$location.path('/MainPage')
+	}
+	$scope.logout= function(){
+		$window.localStorage.setItem("id_token","")
+		$window.localStorage.setItem("user","")
+		$location.path("/login")
+	}
+	$scope.setdept= function(k)
+	{
+		if(k==0){
+			$scope.current_appointments=$scope.cardiology
+			$scope.department="Cardiology"
+		}else if(k==1){
+			$scope.current_appointments=$scope.opthamology
+			$scope.department="Opthalmology"
+		}else{
+			$scope.current_appointments=$scope.physiology
+			$scope.department="Physiology"
+		}
+	}
+})
+
 app.controller('viewrecordController',function($scope,$http,$location,$window){
 	$scope.currentdept=[]
 	$scope.currentrecords=[]
@@ -199,7 +260,7 @@ app.controller('viewrecordController',function($scope,$http,$location,$window){
 			'Authorization':$window.localStorage.getItem('id_token')
 		}
 	}).then(function(res){
-		$scope.patient=JSON.parse($window.localStorage.getItem('user')).email
+		$scope.patient=JSON.parse($window.localStorage.getItem('user')).email////// getting data from the local storage
 		for(i=0;i<res.data.medical_records.length;i++)
 		{   
             var temp=res.data.medical_records[i]; 
